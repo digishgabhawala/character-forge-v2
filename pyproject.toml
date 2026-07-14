@@ -1,0 +1,30 @@
+[project]
+name = "character-forge-v2"
+version = "0.1.0"
+description = "Consistent character image generator (Mac-local via ComfyUI backend): hero -> reference-conditioned generation. Trimmed fork of character-forge, LoRA training removed."
+requires-python = ">=3.10"
+# No torch/transformers/gradio: those were only needed by character-forge
+# v1's QC-scoring and curate-UI stages, both dropped here. Generation is
+# pure inference-over-HTTP to ComfyUI, so this install is genuinely light.
+dependencies = [
+    "requests",
+    "pillow",
+    "numpy",
+    "pyyaml",
+    "pydantic>=2.6",
+    "typer>=0.12",
+    "huggingface_hub",
+]
+
+[project.scripts]
+forge2 = "forge2.cli:app"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["forge2*"]
+
+[tool.setuptools.package-data]
+forge2 = ["comfy_workflows/*.json"]

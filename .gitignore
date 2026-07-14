@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+
+# Large model binaries (models live in ../imgworks/ComfyUI/models, not here,
+# but keep this in case a workflow ever pulls one down locally)
+*.safetensors
+*.ckpt
+*.gguf
+*.bin
+
+# OS cruft
+.DS_Store

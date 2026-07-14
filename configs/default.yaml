@@ -1,0 +1,40 @@
+# character-forge-v2 — default config (Mac-local, ComfyUI backend).
+# Trimmed fork of character-forge's config: only comfy/gen/concept sections
+# remain, since v2 only does hero-generation + reference-conditioned
+# generation (no dataset/QC/curate/train/validate stages).
+
+workspace: ./workspace
+backend: comfy
+
+comfy:
+  url: http://127.0.0.1:8188
+  # points at the SAME ComfyUI models folder character-forge v1 used --
+  # no re-download needed, both projects share one ComfyUI install.
+  comfy_models_dir: /Users/sthira/workspace/personal-productivity-tools/imgworks/ComfyUI/models
+  workflow_t2i: forge2/comfy_workflows/t2i_gguf.json
+  workflow_edit: forge2/comfy_workflows/edit_gguf.json
+  sampler: euler
+  scheduler: simple
+  shift: 3.1              # blurry/soft outputs? raise to 12-13
+  timeout_s: 7200         # per-image ceiling; Mac + 20B + 40 steps is slow, ok
+  poll_s: 2.0
+  # model files are pre-configured in forge2/config.py (verified set:
+  # Qwen-Image-2512 Q4_K_M, Qwen-Image-Edit-2511 Q4_K_M, Qwen2.5-VL Q4 + mmproj,
+  # qwen_image_vae). Override here only if you change quants.
+
+gen:
+  width: 1024
+  height: 1024
+  speed_profile: full     # full = production quality | lightning = fast drafts
+  steps_full: 40
+  cfg_full: 2.5
+  steps_lightning: 8
+  cfg_lightning: 1.0
+  negative_prompt: >-
+    photorealistic, 3d render, blurry, deformed anatomy, extra limbs,
+    text, watermark, logos on clothing, brand logos, trademarks,
+    inconsistent colors
+
+concept:
+  num_candidates: 12
+  base_seed: 1000

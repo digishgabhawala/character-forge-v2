@@ -1,0 +1,30 @@
+{
+  "character_id": "gtee_dev",
+  "trigger_token": "gtee_dev",
+  "display_name": "Dev",
+  "style_tag": "flat vector cartoon mascot, thick outlines",
+  "species_or_type": "human",
+  "base_description": "a friendly male software engineer cartoon character with a slim build",
+  "signature_attributes": [
+    {
+      "name": "green t-shirt",
+      "prompt_phrase": "plain solid green t-shirt",
+      "color_hex": "#2E8B57"
+    },
+    {
+      "name": "round glasses",
+      "prompt_phrase": "large round black-rimmed glasses",
+      "color_hex": null
+    },
+    {
+      "name": "messy dark hair",
+      "prompt_phrase": "short messy dark brown hair",
+      "color_hex": null
+    }
+  ],
+  "personality": "the skeptic of the group; dry humor; asks 'but does it scale?'",
+  "negative_traits": "no logos, no text on clothing, never photorealistic",
+  "hero_image": "hero.png",
+  "created_at": "2026-07-04T05:12:26.265563+00:00",
+  "notes": "First test character. Keep the design boring-simple on purpose -- we are testing the PIPELINE, not the art direction.\n"
+}

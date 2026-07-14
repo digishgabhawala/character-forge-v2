@@ -1,0 +1,17 @@
+{
+  "filename": "hero_1003.png",
+  "kind": "hero_candidate",
+  "character_id": "gtee_dev",
+  "seed": 1003,
+  "prompt": "flat vector cartoon mascot, thick outlines, character design of a friendly male software engineer cartoon character with a slim build, plain solid green t-shirt, large round black-rimmed glasses, short messy dark brown hair, full body, standing, facing the viewer, arms relaxed at sides, neutral friendly expression, centered composition, plain white background, clean bold linework, flat colors, high quality character reference",
+  "variation": null,
+  "source_image": null,
+  "model_id": "qwen-image-2512-Q4_K_M.gguf",
+  "steps": 40,
+  "guidance": 2.5,
+  "created_at": "2026-07-04T05:51:26.004114+00:00",
+  "clip_sim_to_hero": null,
+  "palette_delta": null,
+  "qc_flags": [],
+  "decision": null
+}

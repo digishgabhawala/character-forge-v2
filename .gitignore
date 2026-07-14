@@ -12,5 +12,10 @@ venv/
 *.gguf
 *.bin
 
+# Runtime generation output -- these are produced on every `forge2 generate`
+# call (by design, that's the whole point), not source. hero.png and
+# 01_hero_candidates/ ARE committed (character provenance); this isn't.
+workspace/*/generated/
+
 # OS cruft
 .DS_Store

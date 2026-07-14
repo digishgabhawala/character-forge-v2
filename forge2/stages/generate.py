@@ -82,7 +82,13 @@ def run_generate(cfg: ForgeConfig, character_id: str, task: str,
         manifest.finish(manifest_path)
         log.info("Saved %s", out_dir / fname)
         out_path = out_dir / fname
-    except Exception as e:
+    except (Exception, SystemExit) as e:
+        # SystemExit (raised by comfy_backend.py's connectivity check and the
+        # hero.png-missing guard above) is a BaseException, not an Exception --
+        # without catching it explicitly here, a "ComfyUI unreachable" failure
+        # exits silently and the caller's callback never fires. Verified via a
+        # live test: pointing at an unreachable ComfyUI port produced exit
+        # code 1 with zero callback POST until this fix.
         if callback_url:
             _post_callback(callback_url, job_id, ok=False, error=str(e))
         raise

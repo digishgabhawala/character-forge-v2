@@ -1,5 +1,6 @@
-"""forge2 CLI -- character-forge-v2. Two capabilities only:
+"""forge2 CLI -- character-forge-v2. Two capabilities, plus a setup helper:
 
+    forge2 download                          # fetch model files (once)
     forge2 concept examples/character_brief.yaml
     forge2 pick-hero gtee_dev hero_1003.png
     forge2 generate gtee_dev "presenting a chart on a whiteboard, office"
@@ -26,6 +27,15 @@ app = typer.Typer(add_completion=False, no_args_is_help=True)
 CONFIG_OPT = typer.Option("configs/default.yaml", "--config", "-c")
 PROFILE_OPT = typer.Option(None, "--profile", "-p",
                            help="full | lightning (overrides config)")
+
+
+@app.command()
+def download(config: str = CONFIG_OPT,
+            comfy_dir: Optional[str] = typer.Option(
+                None, help="path to ComfyUI/models (overrides config)")):
+    """Download all model files into ComfyUI's model folders (~34 GB)."""
+    from scripts.download_models import run_download
+    run_download(load_config(config), comfy_dir)
 
 
 @app.command()

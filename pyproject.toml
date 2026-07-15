@@ -24,7 +24,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["forge2*"]
+include = ["forge2*", "scripts*"]
 
 [tool.setuptools.package-data]
 forge2 = ["comfy_workflows/*.json"]

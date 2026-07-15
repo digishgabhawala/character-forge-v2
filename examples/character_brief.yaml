@@ -1,0 +1,28 @@
+# Example brief: the "green tee" mascot used for gtee_dev (already seeded in
+# workspace/gtee_dev/ -- run this yourself only if creating a NEW character).
+# Design-for-consistency rules baked in:
+#   * <= 3 signature attributes, all BIG and SIMPLE
+#   * plain shirt -- NO logo (logos are composited in post, never diffused)
+#   * flat colors + bold silhouette (drift lives in complexity)
+
+character_id: gtee_dev
+trigger_token: gtee_dev
+display_name: Dev
+style_tag: "flat vector cartoon mascot, thick outlines"
+species_or_type: human
+base_description: "a friendly male software engineer cartoon character with a slim build"
+
+signature_attributes:
+  - name: green t-shirt
+    prompt_phrase: "plain solid green t-shirt"
+    color_hex: "#2E8B57"
+  - name: round glasses
+    prompt_phrase: "large round black-rimmed glasses"
+  - name: messy dark hair
+    prompt_phrase: "short messy dark brown hair"
+
+personality: "placeholder -- real per-character personas (e.g. green=explainer) are a future MVP, not yet designed"
+negative_traits: "no logos, no text on clothing, never photorealistic"
+notes: >
+  First test character. Keep the design boring-simple on purpose --
+  we are testing the PIPELINE, not the art direction.

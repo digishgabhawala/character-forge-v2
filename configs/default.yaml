@@ -32,8 +32,9 @@ gen:
   cfg_lightning: 1.0
   negative_prompt: >-
     photorealistic, 3d render, blurry, deformed anatomy, extra limbs,
-    text, watermark, logos on clothing, brand logos, trademarks,
-    inconsistent colors
+    text, words, letters, writing, typography, captions, labels, signage,
+    readable text, illegible text, garbled text, watermark, logos on
+    clothing, brand logos, trademarks, inconsistent colors
 
 concept:
   num_candidates: 12

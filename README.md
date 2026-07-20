@@ -89,12 +89,44 @@ it, this note should be updated with the real result.
 
 ## Setup
 
+**One venv is enough for both ComfyUI and `forge2`** -- if you already have
+a venv with ComfyUI's dependencies installed (e.g. the one from
+"Installing ComfyUI" above), reuse it here instead of creating a second one:
+
 ```bash
 cd character-forge-v2
-pip install -e .
-forge2 --help
-# should list: download, concept, pick-hero, generate
+/path/to/existing/venv/bin/pip install -e .
 ```
+
+Or keep them separate, if you'd rather:
+```bash
+cd character-forge-v2
+python3 -m venv .venv
+.venv/bin/pip install -e .
+```
+
+Either way, confirm it worked: `<venv>/bin/forge2 --help` should list
+`download`, `concept`, `pick-hero`, `generate`.
+
+### Every time you want to use this, start here
+
+1. **Start ComfyUI** in its own terminal, and leave it running for the
+   whole session -- `concept`/`pick-hero`/`generate` all talk to it over
+   HTTP and fail immediately if it's not reachable:
+   ```bash
+   cd /path/to/ComfyUI
+   /path/to/venv/bin/python main.py
+   # wait for "Starting server" in the logs -- reachable at http://127.0.0.1:8188
+   ```
+2. **Activate your venv**, in a second terminal, for running `forge2`
+   commands:
+   ```bash
+   source /path/to/venv/bin/activate
+   forge2 --help
+   ```
+
+No need to restart ComfyUI between `forge2` commands -- only if it gets
+into a bad state (see Known issues below).
 
 ## Configuration
 

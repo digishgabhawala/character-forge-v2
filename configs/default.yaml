@@ -8,9 +8,10 @@ backend: comfy
 
 comfy:
   url: http://127.0.0.1:8188
-  # points at the SAME ComfyUI models folder character-forge v1 used --
-  # no re-download needed, both projects share one ComfyUI install.
-  comfy_models_dir: /Users/sthira/workspace/personal-productivity-tools/imgworks/ComfyUI/models
+  # Path to your ComfyUI/models folder -- only needed for `forge2 download`.
+  # Leave unset here and pass --comfy-dir instead (see scripts/download_models.py),
+  # or set it to your own absolute path if you'd rather keep it in config.
+  comfy_models_dir: null
   workflow_t2i: forge2/comfy_workflows/t2i_gguf.json
   workflow_edit: forge2/comfy_workflows/edit_gguf.json
   sampler: euler

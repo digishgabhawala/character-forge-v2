@@ -3,6 +3,7 @@ name = "character-forge-v2"
 version = "0.1.0"
 description = "Consistent character image generator (Mac-local via ComfyUI backend): hero -> reference-conditioned generation. Trimmed fork of character-forge, LoRA training removed."
 requires-python = ">=3.10"
+license = "MIT"
 # No torch/transformers/gradio: those were only needed by character-forge
 # v1's QC-scoring and curate-UI stages, both dropped here. Generation is
 # pure inference-over-HTTP to ComfyUI, so this install is genuinely light.

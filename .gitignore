@@ -4,6 +4,8 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
+.pytest_cache/
+.ruff_cache/
 
 # Large model binaries (models live in ../imgworks/ComfyUI/models, not here,
 # but keep this in case a workflow ever pulls one down locally)

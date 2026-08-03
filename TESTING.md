@@ -1,11 +1,33 @@
 # What's been verified, and where to see it
 
-No automated test suite exists yet -- everything below was verified by
-actually running the code against a live ComfyUI server and inspecting real
-output (not mocked), during the build session on 2026-07-14/15. This file is
-the index; the primary evidence is the **git commit messages**
-(`git log`) and the **conversation transcript** where each check happened,
-since the checks are ad-hoc shell/curl sessions, not committed test files.
+## Automated tests
+
+```bash
+pip install -e ".[dev]"
+pytest tests/ -v
+ruff check .
+```
+
+`tests/` covers the pure-logic pieces that are cheap to regress silently and
+don't need ComfyUI running: `CharacterCard`/`workspace_layout` (`schemas.py`),
+config loading incl. a regression guard that `configs/default.yaml` never
+bakes in a machine-specific path again (`config.py`), profile resolution
+(`backend.py`), and prompt template assembly (`prompts/templates.py`).
+
+**What automated tests deliberately do NOT cover**: anything touching
+ComfyUI itself (`comfy_backend.py`, the actual `concept`/`generate` stages) --
+that's genuinely an integration surface (a live GPU server, real model
+weights, real image output) that a mock would give false confidence about.
+Those are verified live instead, per below.
+
+## Everything else: verified live, not mocked
+
+Everything below was verified by actually running the code against a live
+ComfyUI server and inspecting real output (not mocked), during the build
+session on 2026-07-14/15. This file is the index; the primary evidence is the
+**git commit messages** (`git log`) and the **conversation transcript** where
+each check happened, since the checks are ad-hoc shell/curl sessions, not
+committed test files.
 
 ## How to see it
 
@@ -43,7 +65,6 @@ The three commits and what each one's message documents:
 
 ## What is NOT covered
 
-- No automated regression tests (pytest or otherwise) exist for this repo.
 - The `concept`/`pick-hero` commands were exercised as part of building the
   original `gtee_dev` character in the sibling `character-forge` project
   (before the v2 trim), not freshly re-verified end-to-end in v2 itself --

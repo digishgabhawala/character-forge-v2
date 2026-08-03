@@ -26,7 +26,6 @@ import logging
 import time
 import uuid
 from pathlib import Path
-from typing import Optional
 
 import requests
 from PIL import Image
@@ -55,7 +54,7 @@ def find_one(graph: dict, class_type: str) -> str:
     return ids[0]
 
 
-def find_by_title(graph: dict, title: str) -> Optional[str]:
+def find_by_title(graph: dict, title: str) -> str | None:
     for nid, n in graph.items():
         if n.get("_meta", {}).get("title", "").lower() == title.lower():
             return nid
@@ -194,7 +193,7 @@ class ComfyBackend:
             f"comfy.timeout_s (Mac + 20B + full steps can be slow).")
 
     # -- graph assembly --------------------------------------------------
-    def _lightning_name(self) -> Optional[str]:
+    def _lightning_name(self) -> str | None:
         f = self.cfg.comfy.files
         hf = f.lightning_t2i if self.kind == "t2i" else f.lightning_edit
         return hf.local_name if hf else None

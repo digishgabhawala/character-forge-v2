@@ -22,8 +22,8 @@ import logging
 from pathlib import Path
 
 from forge2.config import ForgeConfig
-from forge2.schemas import CandidateMeta, CharacterCard, StageManifest, workspace_layout
 from forge2.prompts.templates import build_generate_instruction
+from forge2.schemas import CandidateMeta, CharacterCard, StageManifest, workspace_layout
 
 log = logging.getLogger("forge2.generate")
 

@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Protocol
+from typing import Protocol
 
 
 class Backend(Protocol):
@@ -39,7 +39,7 @@ class Profile:
     use_lightning: bool
 
 
-def resolve_profile(cfg, override: Optional[str] = None) -> Profile:
+def resolve_profile(cfg, override: str | None = None) -> Profile:
     name = override or cfg.gen.speed_profile
     if name == "lightning":
         return Profile("lightning", cfg.gen.steps_lightning,
@@ -47,13 +47,13 @@ def resolve_profile(cfg, override: Optional[str] = None) -> Profile:
     return Profile("full", cfg.gen.steps_full, cfg.gen.cfg_full, False)
 
 
-def get_t2i(cfg, profile: Optional[str] = None) -> Backend:
+def get_t2i(cfg, profile: str | None = None) -> Backend:
     from forge2.comfy_backend import ComfyBackend
     p = resolve_profile(cfg, profile)
     return ComfyBackend(cfg, kind="t2i", profile=p)
 
 
-def get_edit(cfg, profile: Optional[str] = None) -> Backend:
+def get_edit(cfg, profile: str | None = None) -> Backend:
     from forge2.comfy_backend import ComfyBackend
     p = resolve_profile(cfg, profile)
     return ComfyBackend(cfg, kind="edit", profile=p)

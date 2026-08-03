@@ -9,11 +9,10 @@ image from a locked hero + instruction.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, Field
-
 
 # ---------------------------------------------------------------------------
 # ComfyUI backend
@@ -25,7 +24,7 @@ class HFFile(BaseModel):
     repo: str
     filename: str
     dest: str                      # subfolder under ComfyUI/models/
-    save_as: Optional[str] = None  # rename after download (mmproj prefix rule)
+    save_as: str | None = None  # rename after download (mmproj prefix rule)
     optional: bool = False
 
     @property
@@ -78,7 +77,7 @@ class ComfyConfig(BaseModel):
     # unsloth tip: if outputs come out blurry/bad, raise shift to 12-13
     shift: float = 3.1
     # where your ComfyUI/models lives; used by LoRA auto-copy.
-    comfy_models_dir: Optional[str] = None   # e.g. ~/ComfyUI/models
+    comfy_models_dir: str | None = None   # e.g. ~/ComfyUI/models
     timeout_s: int = 7200                    # per-image ceiling (Mac = slow ok)
     poll_s: float = 2.0
 

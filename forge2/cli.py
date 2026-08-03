@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 import typer
 
@@ -31,7 +30,7 @@ PROFILE_OPT = typer.Option(None, "--profile", "-p",
 
 @app.command()
 def download(config: str = CONFIG_OPT,
-            comfy_dir: Optional[str] = typer.Option(
+            comfy_dir: str | None = typer.Option(
                 None, help="path to ComfyUI/models (overrides config)")):
     """Download all model files into ComfyUI's model folders (~34 GB)."""
     from scripts.download_models import run_download
@@ -39,7 +38,7 @@ def download(config: str = CONFIG_OPT,
 
 
 @app.command()
-def concept(brief: Path, profile: Optional[str] = PROFILE_OPT,
+def concept(brief: Path, profile: str | None = PROFILE_OPT,
             config: str = CONFIG_OPT):
     """Character brief -> hero candidates."""
     from forge2.stages.concept import run_concept
@@ -56,12 +55,12 @@ def pick_hero(character_id: str, filename: str, config: str = CONFIG_OPT):
 @app.command()
 def generate(character_id: str, task: str,
             seed: int = typer.Option(0, "--seed"),
-            profile: Optional[str] = PROFILE_OPT,
-            out_name: Optional[str] = typer.Option(None, "--out"),
-            callback_url: Optional[str] = typer.Option(
+            profile: str | None = PROFILE_OPT,
+            out_name: str | None = typer.Option(None, "--out"),
+            callback_url: str | None = typer.Option(
                 None, "--callback-url",
                 help="POST {job_id, ok, image_path|error} here when done."),
-            job_id: Optional[str] = typer.Option(
+            job_id: str | None = typer.Option(
                 None, "--job-id", help="Echoed back in the callback payload."),
             config: str = CONFIG_OPT):
     """Production, no LoRA: hero + freeform instruction -> one image."""

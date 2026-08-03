@@ -6,10 +6,9 @@ CandidateMeta/workspace_layout are trimmed to what concept+generate need.
 """
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -31,7 +30,7 @@ class SignatureAttribute(BaseModel):
     """
     name: str                      # e.g. "green t-shirt"
     prompt_phrase: str             # exact phrase used in every prompt
-    color_hex: Optional[str] = None  # for palette-drift QC, e.g. "#2E8B57"
+    color_hex: str | None = None  # for palette-drift QC, e.g. "#2E8B57"
 
 
 class CharacterCard(BaseModel):
@@ -46,7 +45,7 @@ class CharacterCard(BaseModel):
     personality: str = ""          # e.g. "the skeptic; dry humor" (consumed by
     #                                the LinkedIn content agent, not by this pipeline)
     negative_traits: str = ""      # things to keep OUT of prompts/images
-    hero_image: Optional[str] = None   # relative path once selected
+    hero_image: str | None = None   # relative path once selected
     created_at: str = Field(default_factory=_now)
     notes: str = ""
 
@@ -55,7 +54,7 @@ class CharacterCard(BaseModel):
         path.write_text(self.model_dump_json(indent=2))
 
     @classmethod
-    def load(cls, path: Path) -> "CharacterCard":
+    def load(cls, path: Path) -> CharacterCard:
         return cls.model_validate_json(path.read_text())
 
     # -- prompt helpers ----------------------------------------------------
@@ -78,7 +77,7 @@ class CandidateMeta(BaseModel):
     character_id: str
     seed: int
     prompt: str                    # full prompt / edit instruction actually sent
-    source_image: Optional[str] = None   # hero path for edits
+    source_image: str | None = None   # hero path for edits
     model_id: str = ""
     steps: int = 0
     guidance: float = 0.0
@@ -97,7 +96,7 @@ class StageManifest(BaseModel):
     stage: str
     character_id: str
     started_at: str = Field(default_factory=_now)
-    finished_at: Optional[str] = None
+    finished_at: str | None = None
     config_snapshot: dict = Field(default_factory=dict)
     items: list[str] = Field(default_factory=list)   # filenames produced
     stats: dict = Field(default_factory=dict)

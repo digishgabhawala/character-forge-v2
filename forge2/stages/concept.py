@@ -17,9 +17,15 @@ from pathlib import Path
 import yaml
 
 from forge2.config import ForgeConfig
-from forge2.schemas import (CandidateMeta, CharacterCard, SignatureAttribute,
-                            StageManifest, ensure_dirs, workspace_layout)
 from forge2.prompts.templates import build_hero_prompt
+from forge2.schemas import (
+    CandidateMeta,
+    CharacterCard,
+    SignatureAttribute,
+    StageManifest,
+    ensure_dirs,
+    workspace_layout,
+)
 
 log = logging.getLogger("forge2.concept")
 

@@ -128,6 +128,17 @@ Either way, confirm it worked: `<venv>/bin/forge2 --help` should list
 No need to restart ComfyUI between `forge2` commands -- only if it gets
 into a bad state (see Known issues below).
 
+## Development
+
+```bash
+pip install -e ".[dev]"
+ruff check .
+pytest tests/ -v
+```
+
+See [TESTING.md](TESTING.md) for what's covered by automated tests vs.
+verified live against ComfyUI.
+
 ## Configuration
 
 `configs/default.yaml` is the single config file:
@@ -229,6 +240,7 @@ forge2/
   stages/concept.py         -- run_concept(), pick_hero()
   stages/generate.py        -- run_generate() + callback support
 scripts/download_models.py  -- fetches model files (used by `forge2 download`)
+tests/                      -- pytest coverage for the pure-logic pieces (see TESTING.md)
 workspace/<character_id>/
   character.json            -- the character card (identity, locked)
   hero.png                  -- the locked reference image

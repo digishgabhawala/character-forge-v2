@@ -17,6 +17,9 @@ dependencies = [
     "huggingface_hub",
 ]
 
+[project.optional-dependencies]
+dev = ["ruff", "pytest"]
+
 [project.scripts]
 forge2 = "forge2.cli:app"
 
@@ -29,3 +32,6 @@ include = ["forge2*", "scripts*"]
 
 [tool.setuptools.package-data]
 forge2 = ["comfy_workflows/*.json"]
+
+[tool.ruff]
+target-version = "py310"

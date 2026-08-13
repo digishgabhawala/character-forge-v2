@@ -50,4 +50,12 @@ if [ "$MODELS_DIR" != "$COMFYUI_DIR/models" ]; then
   ln -s "$MODELS_DIR" "$COMFYUI_DIR/models"
 fi
 
+# Found live on Colab: the standard ~107GB disk was at 90GB used after this
+# script's pip installs + a 34GB model download, before anything downstream
+# (e.g. an Ollama pull, in linkedin-content-agent's combined notebook) even
+# ran. pip's wheel cache is the one big, unconditionally-safe thing to
+# reclaim here -- it holds nothing this script or forge2 needs again this
+# session (a re-run just re-downloads).
+pip cache purge > /dev/null 2>&1 || true
+
 echo "== Done. Start ComfyUI with: python $COMFYUI_DIR/main.py =="

@@ -23,6 +23,7 @@ from pathlib import Path
 
 from forge2.config import ForgeConfig
 from forge2.prompts.templates import build_generate_instruction
+from forge2.quality import CorruptOutputError, degenerate_reason
 from forge2.schemas import CandidateMeta, CharacterCard, StageManifest, workspace_layout
 
 log = logging.getLogger("forge2.generate")
@@ -70,6 +71,10 @@ def run_generate(cfg: ForgeConfig, character_id: str, task: str,
 
         fname = out_name or f"gen_{seed:05d}.png"
         img.save(out_dir / fname)
+        # Saved first on purpose: the blank file stays on disk for diagnosis.
+        reason = degenerate_reason(img)
+        if reason:
+            raise CorruptOutputError(f"corrupt_output: {reason}; saved as {fname}")
         CandidateMeta(filename=fname, kind="generated", character_id=character_id,
                      seed=seed, prompt=instruction, source_image="hero.png",
                      model_id=be.model_name, steps=be.effective_steps,

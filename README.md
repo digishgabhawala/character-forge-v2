@@ -225,15 +225,11 @@ Useful flags:
   rescan/full-quality/lightning choices and the top memory consumers shown.
 - [x] Detect degenerate (near-uniform) output and fail `generate` with exit
   code 3 instead of returning a blank image as success.
-- **Auto-restart ComfyUI after a corrupt render** -- owned by the task-queue
-  image worker's planned ComfyUI supervision; no automatic retry (the caller
-  decides).
-- **Manage the ComfyUI process internally** -- start it (and stop it when
-  idle) as part of this tool's own lifecycle, instead of requiring the
-  caller to have it already running on a known port. Would make setup
-  simpler for any consumer (no separate terminal, no port coordination) at
-  the cost of this tool owning a chunk of process-management complexity it
-  doesn't have today.
+- [x] ComfyUI lifecycle (start on demand, stop when idle, restart after a
+  corrupt render) -- done by the task-queue image worker, which is the
+  supported way to run renders (see task-queue README). forge2 itself still
+  expects a running ComfyUI when called directly; no automatic retry (the
+  caller decides).
 - **Verify (or fix) portability off Mac** -- Linux/NVIDIA and free-tier
   Colab are both plausible but genuinely untested; see the notes above.
 

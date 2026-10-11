@@ -200,7 +200,10 @@ Useful flags:
   uptime across many model load/unload cycles, appears to accumulate bad
   GPU/MPS state -- restarting the ComfyUI process resolved it. If a render
   looks wrong, check free RAM (`curl localhost:8188/system_stats`) and
-  consider restarting ComfyUI before re-running.
+  consider restarting ComfyUI before re-running. `forge2 generate` now
+  detects this: a near-uniform result (max per-channel stddev < 2.0) is
+  still saved for diagnosis, but the command fails with a `corrupt_output:`
+  message and **exit code 3** (callbacks get `ok: false` with that error).
 - **A retry MUST use a fresh seed.** ComfyUI caches per-node outputs keyed on
   exact input values including seed -- resubmitting the same seed replays
   whatever was cached last time (including a corrupted result) in ~0ms with
@@ -220,10 +223,11 @@ Useful flags:
 - [x] Ask ComfyUI to unload models and free memory after every terminal job.
 - [x] Add a 14 GB pre-flight RAM check in the consuming application, with
   rescan/full-quality/lightning choices and the top memory consumers shown.
-- **Automatic corrupted-image detection + auto-restart ComfyUI** -- detect a
-  degenerate (e.g. near-uniform-color) output and automatically restart the
-  ComfyUI process and retry, rather than requiring a human to notice and
-  intervene.
+- [x] Detect degenerate (near-uniform) output and fail `generate` with exit
+  code 3 instead of returning a blank image as success.
+- **Auto-restart ComfyUI after a corrupt render** -- owned by the task-queue
+  image worker's planned ComfyUI supervision; no automatic retry (the caller
+  decides).
 - **Manage the ComfyUI process internally** -- start it (and stop it when
   idle) as part of this tool's own lifecycle, instead of requiring the
   caller to have it already running on a known port. Would make setup

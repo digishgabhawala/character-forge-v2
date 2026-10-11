@@ -64,10 +64,15 @@ def generate(character_id: str, task: str,
                 None, "--job-id", help="Echoed back in the callback payload."),
             config: str = CONFIG_OPT):
     """Production, no LoRA: hero + freeform instruction -> one image."""
+    from forge2.quality import CORRUPT_EXIT_CODE, CorruptOutputError
     from forge2.stages.generate import run_generate
-    run_generate(load_config(config), character_id, task, seed=seed,
-                profile=profile, out_name=out_name,
-                callback_url=callback_url, job_id=job_id)
+    try:
+        run_generate(load_config(config), character_id, task, seed=seed,
+                     profile=profile, out_name=out_name,
+                     callback_url=callback_url, job_id=job_id)
+    except CorruptOutputError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(CORRUPT_EXIT_CODE) from e
 
 
 if __name__ == "__main__":

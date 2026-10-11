@@ -187,10 +187,9 @@ Useful flags:
 - `--out my_image.png` -- custom output filename
 - `--profile lightning` -- fast low-quality draft instead of full quality
 - `--callback-url <url> --job-id <id>` -- POST `{job_id, ok, image_path|error}`
-  to that URL when done, instead of blocking. This is how
-  `linkedin-content-agent` uses it (see `image_service.py` there for the
-  exact `subprocess.Popen(...)` invocation) -- but any caller can use the
-  same mechanism.
+  to that URL when done, instead of blocking. This remains available for
+  generic integrations; the current `linkedin-content-agent` path submits
+  to `task-queue`, whose local image worker runs `forge2 generate` directly.
 
 ## Known issues / operational notes
 

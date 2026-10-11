@@ -1,4 +1,9 @@
+import io
+
+from PIL import Image
+
 from forge2.backend import resolve_profile
+from forge2.comfy_backend import ComfyBackend
 from forge2.config import ForgeConfig
 
 
@@ -26,3 +31,56 @@ def test_resolve_profile_full_uses_full_steps_and_cfg():
     assert profile.use_lightning is False
     assert profile.steps == cfg.gen.steps_full
     assert profile.cfg == cfg.gen.cfg_full
+
+
+def test_completed_comfy_job_frees_models(monkeypatch):
+    png = io.BytesIO()
+    Image.new("RGB", (2, 2), "red").save(png, format="PNG")
+    free_calls = []
+
+    class Response:
+        def __init__(self, payload=None, content=b"", status_code=200):
+            self.payload = payload
+            self.content = content
+            self.status_code = status_code
+            self.text = ""
+
+        def json(self):
+            return self.payload
+
+        def raise_for_status(self):
+            pass
+
+    def fake_post(url, json, timeout):
+        if url.endswith("/prompt"):
+            return Response({"prompt_id": "p1"})
+        free_calls.append((url, json))
+        return Response({})
+
+    def fake_get(url, **kwargs):
+        if "/history/" in url:
+            return Response({
+                "p1": {
+                    "status": {"status_str": "success"},
+                    "outputs": {"9": {"images": [{"filename": "out.png"}]}},
+                }
+            })
+        return Response(content=png.getvalue())
+
+    monkeypatch.setattr("forge2.comfy_backend.requests.post", fake_post)
+    monkeypatch.setattr("forge2.comfy_backend.requests.get", fake_get)
+
+    backend = ComfyBackend.__new__(ComfyBackend)
+    backend.url = "http://127.0.0.1:8188"
+    backend.client_id = "client"
+    backend.cfg = type("Cfg", (), {"comfy": type("Comfy", (), {
+        "timeout_s": 5, "poll_s": 0,
+    })()})()
+
+    result = backend._submit_and_fetch({"1": {}})
+
+    assert result.size == (2, 2)
+    assert free_calls == [(
+        "http://127.0.0.1:8188/free",
+        {"unload_models": True, "free_memory": True},
+    )]

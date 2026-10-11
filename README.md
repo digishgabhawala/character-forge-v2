@@ -47,7 +47,7 @@ python3 -m venv .venv          # or reuse an existing venv
 # loaders this pipeline's workflows use):
 git clone https://github.com/city96/ComfyUI-GGUF.git custom_nodes/ComfyUI-GGUF
 .venv/bin/pip install -r custom_nodes/ComfyUI-GGUF/requirements.txt
-.venv/bin/python main.py       # starts the server on :8188
+.venv/bin/python main.py --cache-none  # starts :8188 without retaining model caches
 ```
 
 **Downloading the models** (~34 GB, GGUF-quantized -- see "Why GGUF" below):
@@ -114,8 +114,12 @@ Either way, confirm it worked: `<venv>/bin/forge2 --help` should list
    whole session -- `concept`/`pick-hero`/`generate` all talk to it over
    HTTP and fail immediately if it's not reachable:
    ```bash
+   # From this repository, using sibling imgworks/ComfyUI + comfyui-env:
+   scripts/start_comfyui.sh
+
+   # Or launch another installation directly:
    cd /path/to/ComfyUI
-   /path/to/venv/bin/python main.py
+   /path/to/venv/bin/python main.py --cache-none
    # wait for "Starting server" in the logs -- reachable at http://127.0.0.1:8188
    ```
 2. **Activate your venv**, in a second terminal, for running `forge2`
@@ -125,8 +129,9 @@ Either way, confirm it worked: `<venv>/bin/forge2 --help` should list
    forge2 --help
    ```
 
-No need to restart ComfyUI between `forge2` commands -- only if it gets
-into a bad state (see Known issues below).
+`--cache-none` is intentional on memory-constrained unified-memory Macs: it
+prevents completed graph outputs from pinning several additional GB. Forge2
+also asks ComfyUI to unload models and free memory after each terminal job.
 
 ## Development
 
@@ -210,10 +215,12 @@ Useful flags:
   Behavior on a real dedicated-VRAM GPU (Colab, a Linux box with an NVIDIA
   card) is untested and may differ, for better or worse.
 
-## Upcoming / backlog (not built yet)
+## Implementation TODO
 
-- **Pre-flight RAM check** before starting a render -- warn or abort if free
-  RAM is too low, instead of silently producing a corrupted black image.
+- [x] Start the supported local ComfyUI launcher with `--cache-none`.
+- [x] Ask ComfyUI to unload models and free memory after every terminal job.
+- [x] Add a 14 GB pre-flight RAM check in the consuming application, with
+  rescan/full-quality/lightning choices and the top memory consumers shown.
 - **Automatic corrupted-image detection + auto-restart ComfyUI** -- detect a
   degenerate (e.g. near-uniform-color) output and automatically restart the
   ComfyUI process and retry, rather than requiring a human to notice and

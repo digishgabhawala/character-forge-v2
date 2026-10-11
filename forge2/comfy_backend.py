@@ -160,6 +160,22 @@ class ComfyBackend:
         r.raise_for_status()
         return r.json()["name"]
 
+    def _free_models(self) -> None:
+        """Best-effort release after a terminal job result.
+
+        The render result is already complete at this point, so cleanup must
+        not replace it with an error if an older ComfyUI lacks this endpoint.
+        """
+        try:
+            r = requests.post(
+                f"{self.url}/free",
+                json={"unload_models": True, "free_memory": True},
+                timeout=30,
+            )
+            r.raise_for_status()
+        except requests.RequestException as exc:
+            log.warning("ComfyUI completed the job but model cleanup failed: %s", exc)
+
     def _submit_and_fetch(self, graph: dict) -> Image.Image:
         r = requests.post(f"{self.url}/prompt",
                           json={"prompt": graph, "client_id": self.client_id},
@@ -175,6 +191,7 @@ class ComfyBackend:
                 entry = h[pid]
                 status = entry.get("status", {})
                 if status.get("status_str") == "error":
+                    self._free_models()
                     raise RuntimeError(
                         f"ComfyUI execution error: "
                         f"{json.dumps(status)[:2000]}")
@@ -186,7 +203,13 @@ class ComfyBackend:
                                     "subfolder": im.get("subfolder", ""),
                                     "type": im.get("type", "output")},
                             timeout=120).content
-                        return Image.open(io.BytesIO(raw)).convert("RGB")
+                        image = Image.open(io.BytesIO(raw)).convert("RGB")
+                        image.load()
+                        self._free_models()
+                        return image
+                if status.get("status_str") == "success":
+                    self._free_models()
+                    raise RuntimeError("ComfyUI completed without returning an image")
             time.sleep(self.cfg.comfy.poll_s)
         raise TimeoutError(
             f"Image not ready after {self.cfg.comfy.timeout_s}s -- raise "
@@ -232,6 +255,7 @@ class ComfyBackend:
         return self._submit_and_fetch(g)
 
     def close(self) -> None:
-        # ComfyUI manages its own model memory (loads/unloads between the
-        # t2i and edit UNets automatically). Nothing to free client-side.
+        # Cleanup happens immediately when a submitted job reaches a terminal
+        # state. Do not call /free again here because close() can also run after
+        # a timeout while ComfyUI is still legitimately rendering.
         pass

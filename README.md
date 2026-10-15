@@ -185,6 +185,11 @@ forge2 generate gtee_dev "presenting a chart on a whiteboard, office" --seed 42
 
 Useful flags:
 - `--out my_image.png` -- custom output filename
+- `--hero-path /tmp/hero.png --card-path /tmp/character.json` -- use an
+  explicit locked hero and CharacterCard instead of `workspace/<id>/`; this
+  keeps hosted/task-queue integrations stateless while the original local
+  workspace flow remains the default
+- `--output-path /tmp/result.png` -- write to an explicit task-owned path
 - `--profile lightning` -- fast low-quality draft instead of full quality
 - `--callback-url <url> --job-id <id>` -- POST `{job_id, ok, image_path|error}`
   to that URL when done, instead of blocking. This remains available for

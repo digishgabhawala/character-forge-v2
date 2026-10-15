@@ -50,6 +50,14 @@ class _BlackBackend:
         pass
 
 
+class _DetailedBackend(_BlackBackend):
+    def edit(self, **kwargs):
+        image = Image.new("RGB", (64, 64), (255, 255, 255))
+        ImageDraw.Draw(image).rectangle([8, 8, 48, 48], fill=(20, 120, 60))
+        self.kwargs = kwargs
+        return image
+
+
 def test_corrupt_render_fails_and_reports_callback(tmp_path, monkeypatch):
     cfg = ForgeConfig(workspace=str(tmp_path))
     base = tmp_path / "dev"
@@ -78,3 +86,25 @@ def test_cli_exits_with_corrupt_code(monkeypatch):
     result = CliRunner().invoke(cli.app, ["generate", "dev", "waving"])
     assert result.exit_code == CORRUPT_EXIT_CODE
     assert "corrupt_output:" in result.output
+
+
+def test_generate_accepts_explicit_remote_assets_and_output_path(tmp_path, monkeypatch):
+    """A stateless worker need not have workspace/<id>/ at all."""
+    cfg = ForgeConfig(workspace=str(tmp_path / "empty-workspace"))
+    card_path = tmp_path / "downloaded-character.json"
+    hero_path = tmp_path / "downloaded-hero.png"
+    output_path = tmp_path / "task" / "result.png"
+    CharacterCard(character_id="remote-dev", trigger_token="remote-dev",
+                  base_description="a remote character").save(card_path)
+    Image.new("RGB", (64, 64), (255, 255, 255)).save(hero_path)
+    backend = _DetailedBackend()
+    monkeypatch.setattr(backend_module, "get_edit", lambda cfg, profile=None: backend)
+
+    result = generate_stage.run_generate(
+        cfg, "remote-dev", "waving", seed=7,
+        hero_path=hero_path, card_path=card_path, output_path=output_path,
+    )
+
+    assert result == output_path and output_path.exists()
+    assert backend.kwargs["image_path"] == hero_path
+    assert not (tmp_path / "empty-workspace" / "remote-dev").exists()

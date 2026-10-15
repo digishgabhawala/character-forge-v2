@@ -47,6 +47,44 @@ def card_from_brief(brief_path: Path) -> CharacterCard:
     )
 
 
+def _generate_hero_candidate(cfg: ForgeConfig, be, card: CharacterCard,
+                             seed: int, output_path: Path) -> CandidateMeta:
+    """Generate one candidate at an explicit path and write its sidecar."""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    prompt = build_hero_prompt(card)
+    img = be.generate(prompt=prompt, negative=cfg.gen.negative_prompt,
+                      seed=seed, width=cfg.gen.width, height=cfg.gen.height)
+    img.save(output_path)
+    meta = CandidateMeta(
+        filename=output_path.name,
+        kind="hero_candidate",
+        character_id=card.character_id,
+        seed=seed,
+        prompt=prompt,
+        model_id=be.model_name,
+        steps=be.effective_steps,
+        guidance=be.effective_cfg,
+    )
+    meta.save(output_path.parent)
+    return meta
+
+
+def run_hero_candidate(cfg: ForgeConfig, card_path: Path, seed: int,
+                       output_path: Path, profile: str | None = None) -> Path:
+    """Generate one stateless hero candidate from a durable CharacterCard."""
+    card = CharacterCard.load(card_path)
+    log.info("Hero prompt: %s", build_hero_prompt(card))
+
+    from forge2 import backend
+    be = backend.get_t2i(cfg, profile=profile)
+    try:
+        _generate_hero_candidate(cfg, be, card, seed, output_path)
+    finally:
+        be.close()
+    log.info("Hero candidate written: %s", output_path)
+    return output_path
+
+
 def run_concept(cfg: ForgeConfig, brief_path: Path,
                 profile: str | None = None) -> Path:
     card = card_from_brief(brief_path)
@@ -54,8 +92,7 @@ def run_concept(cfg: ForgeConfig, brief_path: Path,
     ensure_dirs(layout)
     card.save(layout["card"])
 
-    prompt = build_hero_prompt(card)
-    log.info("Hero prompt: %s", prompt)
+    log.info("Hero prompt: %s", build_hero_prompt(card))
 
     from forge2 import backend
     be = backend.get_t2i(cfg, profile=profile)
@@ -70,15 +107,8 @@ def run_concept(cfg: ForgeConfig, brief_path: Path,
                 log.info("  [%d/%d] %s (already exists, skipped)",
                          i + 1, cfg.concept.num_candidates, fname)
                 continue
-            img = be.generate(prompt=prompt, negative=cfg.gen.negative_prompt,
-                              seed=seed, width=cfg.gen.width,
-                              height=cfg.gen.height)
-            img.save(layout["hero_candidates"] / fname)
-            CandidateMeta(filename=fname, kind="hero_candidate",
-                          character_id=card.character_id, seed=seed,
-                          prompt=prompt, model_id=be.model_name,
-                          steps=be.effective_steps, guidance=be.effective_cfg,
-                          ).save(layout["hero_candidates"])
+            _generate_hero_candidate(cfg, be, card, seed,
+                                     layout["hero_candidates"] / fname)
             manifest.items.append(fname)
             log.info("  [%d/%d] %s", i + 1, cfg.concept.num_candidates, fname)
     finally:

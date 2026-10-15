@@ -175,6 +175,15 @@ forge2 pick-hero gtee_dev hero_1003.png
 # locks that one as workspace/gtee_dev/hero.png, the source of truth
 ```
 
+For stateless integrations such as Task Queue, generate exactly one candidate
+from a structured CharacterCard without creating a Character Forge workspace:
+
+```bash
+forge2 hero-candidate /tmp/character.json --seed 1003 \
+  --profile full --output-path /tmp/hero_1003.png
+# also writes /tmp/hero_1003.json with prompt/model/seed provenance
+```
+
 **2. Generate an image** of the locked character doing something:
 
 ```bash

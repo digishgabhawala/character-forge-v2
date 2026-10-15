@@ -46,16 +46,36 @@ def _post_callback(callback_url: str, job_id: str | None, ok: bool,
 def run_generate(cfg: ForgeConfig, character_id: str, task: str,
                  seed: int, profile: str | None = None,
                  out_name: str | None = None,
+                 hero_path: Path | None = None,
+                 card_path: Path | None = None,
+                 output_path: Path | None = None,
                  callback_url: str | None = None,
                  job_id: str | None = None) -> Path:
     try:
         layout = workspace_layout(cfg.workspace_path, character_id)
-        card = CharacterCard.load(layout["card"])
-        hero_path = layout["hero"]
-        if not hero_path.exists():
-            raise SystemExit("hero.png missing -- run `forge2 pick-hero` first.")
+        resolved_card_path = Path(card_path) if card_path is not None else layout["card"]
+        resolved_hero_path = Path(hero_path) if hero_path is not None else layout["hero"]
+        if not resolved_card_path.exists():
+            raise SystemExit(
+                f"character card missing at {resolved_card_path} -- run `forge2 concept` first "
+                "or pass --card-path."
+            )
+        if not resolved_hero_path.exists():
+            raise SystemExit(
+                f"hero image missing at {resolved_hero_path} -- run `forge2 pick-hero` first "
+                "or pass --hero-path."
+            )
+        if output_path is not None and out_name is not None:
+            raise ValueError("pass only one of output_path or out_name")
 
-        out_dir = layout["generated"]
+        card = CharacterCard.load(resolved_card_path)
+        if output_path is not None:
+            out_path = Path(output_path)
+            out_dir = out_path.parent
+            fname = out_path.name
+        else:
+            out_dir = layout["generated"]
+            fname = out_name or f"gen_{seed:05d}.png"
         out_dir.mkdir(parents=True, exist_ok=True)
 
         instruction = build_generate_instruction(card, task)
@@ -64,19 +84,18 @@ def run_generate(cfg: ForgeConfig, character_id: str, task: str,
         from forge2 import backend
         be = backend.get_edit(cfg, profile=profile)
         try:
-            img = be.edit(image_path=hero_path, instruction=instruction,
+            img = be.edit(image_path=resolved_hero_path, instruction=instruction,
                           negative=cfg.gen.negative_prompt, seed=seed)
         finally:
             be.close()
 
-        fname = out_name or f"gen_{seed:05d}.png"
         img.save(out_dir / fname)
         # Saved first on purpose: the blank file stays on disk for diagnosis.
         reason = degenerate_reason(img)
         if reason:
             raise CorruptOutputError(f"corrupt_output: {reason}; saved as {fname}")
         CandidateMeta(filename=fname, kind="generated", character_id=character_id,
-                     seed=seed, prompt=instruction, source_image="hero.png",
+                     seed=seed, prompt=instruction, source_image=str(resolved_hero_path),
                      model_id=be.model_name, steps=be.effective_steps,
                      guidance=be.effective_cfg).save(out_dir)
         manifest_path = out_dir / "manifest.json"

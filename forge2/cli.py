@@ -26,6 +26,15 @@ app = typer.Typer(add_completion=False, no_args_is_help=True)
 CONFIG_OPT = typer.Option("configs/default.yaml", "--config", "-c")
 PROFILE_OPT = typer.Option(None, "--profile", "-p",
                            help="full | lightning (overrides config)")
+HERO_PATH_OPT = typer.Option(
+    None, "--hero-path",
+    help="Explicit locked hero image; defaults to workspace/<id>/hero.png.")
+CARD_PATH_OPT = typer.Option(
+    None, "--card-path",
+    help="Explicit character card; defaults to workspace/<id>/character.json.")
+OUTPUT_PATH_OPT = typer.Option(
+    None, "--output-path",
+    help="Explicit output file, useful for stateless/temporary workers.")
 
 
 @app.command()
@@ -57,6 +66,9 @@ def generate(character_id: str, task: str,
             seed: int = typer.Option(0, "--seed"),
             profile: str | None = PROFILE_OPT,
             out_name: str | None = typer.Option(None, "--out"),
+            hero_path: Path | None = HERO_PATH_OPT,
+            card_path: Path | None = CARD_PATH_OPT,
+            output_path: Path | None = OUTPUT_PATH_OPT,
             callback_url: str | None = typer.Option(
                 None, "--callback-url",
                 help="POST {job_id, ok, image_path|error} here when done."),
@@ -69,6 +81,8 @@ def generate(character_id: str, task: str,
     try:
         run_generate(load_config(config), character_id, task, seed=seed,
                      profile=profile, out_name=out_name,
+                     hero_path=hero_path, card_path=card_path,
+                     output_path=output_path,
                      callback_url=callback_url, job_id=job_id)
     except CorruptOutputError as e:
         typer.echo(str(e), err=True)

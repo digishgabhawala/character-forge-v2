@@ -2,6 +2,7 @@
 
     forge2 download                          # fetch model files (once)
     forge2 concept examples/character_brief.yaml
+    forge2 hero-candidate character.json --seed 1000 --output-path hero.png
     forge2 pick-hero gtee_dev hero_1003.png
     forge2 generate gtee_dev "presenting a chart on a whiteboard, office"
 
@@ -35,6 +36,9 @@ CARD_PATH_OPT = typer.Option(
 OUTPUT_PATH_OPT = typer.Option(
     None, "--output-path",
     help="Explicit output file, useful for stateless/temporary workers.")
+HERO_OUTPUT_PATH_OPT = typer.Option(
+    ..., "--output-path",
+    help="Required output file for this stateless hero candidate.")
 
 
 @app.command()
@@ -52,6 +56,18 @@ def concept(brief: Path, profile: str | None = PROFILE_OPT,
     """Character brief -> hero candidates."""
     from forge2.stages.concept import run_concept
     run_concept(load_config(config), brief, profile=profile)
+
+
+@app.command("hero-candidate")
+def hero_candidate(card: Path,
+                   seed: int = typer.Option(..., "--seed"),
+                   output_path: Path = HERO_OUTPUT_PATH_OPT,
+                   profile: str | None = PROFILE_OPT,
+                   config: str = CONFIG_OPT):
+    """CharacterCard + seed -> one candidate at an explicit output path."""
+    from forge2.stages.concept import run_hero_candidate
+    run_hero_candidate(load_config(config), card, seed, output_path,
+                       profile=profile)
 
 
 @app.command("pick-hero")

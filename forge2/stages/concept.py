@@ -18,6 +18,7 @@ import yaml
 
 from forge2.config import ForgeConfig
 from forge2.prompts.templates import build_hero_prompt
+from forge2.quality import CorruptOutputError, degenerate_reason
 from forge2.schemas import (
     CandidateMeta,
     CharacterCard,
@@ -48,13 +49,22 @@ def card_from_brief(brief_path: Path) -> CharacterCard:
 
 
 def _generate_hero_candidate(cfg: ForgeConfig, be, card: CharacterCard,
-                             seed: int, output_path: Path) -> CandidateMeta:
-    """Generate one candidate at an explicit path and write its sidecar."""
+                             seed: int, output_path: Path,
+                             reject_blank: bool = False) -> CandidateMeta:
+    """Generate one candidate at an explicit path and write its sidecar.
+
+    reject_blank: raise CorruptOutputError for a blank/uniform render (saved
+    first for diagnosis, but without a sidecar) instead of offering it."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     prompt = build_hero_prompt(card)
     img = be.generate(prompt=prompt, negative=cfg.gen.negative_prompt,
                       seed=seed, width=cfg.gen.width, height=cfg.gen.height)
     img.save(output_path)
+    if reject_blank:
+        reason = degenerate_reason(img)
+        if reason:
+            raise CorruptOutputError(
+                f"corrupt_output: {reason}; saved as {output_path.name}")
     meta = CandidateMeta(
         filename=output_path.name,
         kind="hero_candidate",
@@ -78,7 +88,9 @@ def run_hero_candidate(cfg: ForgeConfig, card_path: Path, seed: int,
     from forge2 import backend
     be = backend.get_t2i(cfg, profile=profile)
     try:
-        _generate_hero_candidate(cfg, be, card, seed, output_path)
+        # The chosen hero is the reference for every later post: a blank
+        # one must fail (exit 3 via the CLI), never be offered as ready.
+        _generate_hero_candidate(cfg, be, card, seed, output_path, reject_blank=True)
     finally:
         be.close()
     log.info("Hero candidate written: %s", output_path)

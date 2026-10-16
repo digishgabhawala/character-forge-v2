@@ -65,9 +65,14 @@ def hero_candidate(card: Path,
                    profile: str | None = PROFILE_OPT,
                    config: str = CONFIG_OPT):
     """CharacterCard + seed -> one candidate at an explicit output path."""
+    from forge2.quality import CORRUPT_EXIT_CODE, CorruptOutputError
     from forge2.stages.concept import run_hero_candidate
-    run_hero_candidate(load_config(config), card, seed, output_path,
-                       profile=profile)
+    try:
+        run_hero_candidate(load_config(config), card, seed, output_path,
+                           profile=profile)
+    except CorruptOutputError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(CORRUPT_EXIT_CODE) from e
 
 
 @app.command("pick-hero")

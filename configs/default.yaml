@@ -35,7 +35,8 @@ gen:
     photorealistic, 3d render, blurry, deformed anatomy, extra limbs,
     text, words, letters, writing, typography, captions, labels, signage,
     readable text, illegible text, garbled text, watermark, logos on
-    clothing, brand logos, trademarks, inconsistent colors
+    clothing, brand logos, trademarks, inconsistent colors, two people,
+    multiple characters, duplicate character, twins, crowd
 
 concept:
   num_candidates: 12

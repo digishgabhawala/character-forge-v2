@@ -35,3 +35,20 @@ def test_build_generate_instruction_falls_back_to_character_id_without_display_n
     card.display_name = ""
     instruction = build_generate_instruction(card, "waving")
     assert "This is gtee_dev" in instruction
+
+
+def test_build_generate_instruction_asks_for_exactly_one_character():
+    """Some production renders came back with a second copy of the mascot;
+    the instruction must ask for exactly one character."""
+    instruction = build_generate_instruction(_card(), "presenting a chart to a team")
+    lowered = instruction.lower()
+    assert "solo" in lowered
+    assert "a single character" in lowered
+    assert "only one person" in lowered
+
+
+def test_build_hero_prompt_asks_for_exactly_one_character():
+    lowered = build_hero_prompt(_card()).lower()
+    assert "solo" in lowered
+    assert "a single character" in lowered
+    assert "only one person" in lowered

@@ -53,3 +53,19 @@ def test_gen_speed_profile_accepts_known_values(profile):
 def test_gen_speed_profile_rejects_unknown_value():
     with pytest.raises(ValidationError):
         ForgeConfig.model_validate({"gen": {"speed_profile": "turbo"}})
+
+
+MULTI_CHARACTER_NEGATIVES = ("two people", "multiple characters",
+                             "duplicate character", "twins", "crowd")
+
+
+def test_default_negative_prompt_rules_out_a_second_character():
+    negative = ForgeConfig().gen.negative_prompt
+    for phrase in MULTI_CHARACTER_NEGATIVES:
+        assert phrase in negative
+
+
+def test_default_yaml_negative_prompt_rules_out_a_second_character():
+    cfg = load_config(Path(__file__).resolve().parents[1] / "configs" / "default.yaml")
+    for phrase in MULTI_CHARACTER_NEGATIVES:
+        assert phrase in cfg.gen.negative_prompt

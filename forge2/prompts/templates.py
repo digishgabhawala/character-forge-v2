@@ -17,7 +17,8 @@ from forge2.schemas import CharacterCard
 # ---------------------------------------------------------------------------
 
 HERO_TEMPLATE = (
-    "{style}, character design of {identity}, full body, standing, facing the "
+    "{style}, solo, a single character, only one person, character design of "
+    "{identity}, full body, standing, facing the "
     "viewer, arms relaxed at sides, neutral friendly expression, centered "
     "composition, plain white background, clean bold linework, flat colors, "
     "high quality character reference"
@@ -36,8 +37,9 @@ def build_hero_prompt(card: CharacterCard) -> str:
 GENERATE_TEMPLATE = (
     "This is {name}, a {style} character. Keep the exact same character with "
     "identical face, hairstyle, body proportions, outfit and colors "
-    "({identity}). Change only the following: {task}. Same art style, clean "
-    "bold linework, flat colors."
+    "({identity}). Change only the following: {task}. Solo: a single "
+    "character, only one person in the image -- never a second copy of "
+    "{name}. Same art style, clean bold linework, flat colors."
 )
 
 

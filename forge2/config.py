@@ -98,7 +98,8 @@ class GenConfig(BaseModel):
     negative_prompt: str = (
         "photorealistic, 3d render, blurry, deformed anatomy, extra limbs, "
         "text, watermark, logos on clothing, brand logos, trademarks, "
-        "inconsistent colors"
+        "inconsistent colors, two people, multiple characters, duplicate "
+        "character, twins, crowd"
     )
 
 

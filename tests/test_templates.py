@@ -52,3 +52,23 @@ def test_build_hero_prompt_asks_for_exactly_one_character():
     assert "solo" in lowered
     assert "a single character" in lowered
     assert "only one person" in lowered
+
+
+def test_build_generate_instruction_leads_with_the_single_character_constraint():
+    """Lightning renders run at CFG 1.0, where ComfyUI never evaluates the
+    negative prompt, so the positive instruction alone must carry the solo
+    constraint -- first, before the identity lock and the scene."""
+    instruction = build_generate_instruction(_card(), "presenting a chart to a team")
+    opening = instruction.lower()[:160]
+    assert opening.startswith("exactly one character")
+    assert "only one person" in opening
+    assert "no second copy of dev" in opening
+    assert "reflection" in opening
+    assert instruction.index("Exactly one character") < instruction.index("This is Dev")
+    assert instruction.index("This is Dev") < instruction.index("presenting a chart to a team")
+
+
+def test_build_generate_instruction_repeats_the_solo_constraint_after_the_scene():
+    instruction = build_generate_instruction(_card(), "waving")
+    after_task = instruction.split("waving", 1)[1].lower()
+    assert "only one person" in after_task

@@ -14,6 +14,7 @@ longer needs).
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -37,6 +38,14 @@ class Profile:
     steps: int
     cfg: float
     use_lightning: bool
+
+    @property
+    def negative_prompt_applies(self) -> bool:
+        """False at CFG 1.0 (the lightning profile): ComfyUI's
+        sampling_function skips the uncond/negative branch when cond_scale
+        is 1.0, so gen.negative_prompt has NO effect there. Anything that
+        must hold (e.g. a single character) belongs in the positive prompt."""
+        return not math.isclose(self.cfg, 1.0)
 
 
 def resolve_profile(cfg, override: str | None = None) -> Profile:

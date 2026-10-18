@@ -83,6 +83,9 @@ def run_generate(cfg: ForgeConfig, character_id: str, task: str,
 
         from forge2 import backend
         be = backend.get_edit(cfg, profile=profile)
+        if not backend.resolve_profile(cfg, profile).negative_prompt_applies:
+            log.info("CFG %.1f: ComfyUI ignores the negative prompt for this "
+                     "profile; only the positive instruction applies", be.effective_cfg)
         try:
             img = be.edit(image_path=resolved_hero_path, instruction=instruction,
                           negative=cfg.gen.negative_prompt, seed=seed)

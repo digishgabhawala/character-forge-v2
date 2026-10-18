@@ -156,7 +156,7 @@ verified live against ComfyUI.
 | `comfy.timeout_s` | `7200` (2h) | hard ceiling per render before giving up |
 | `comfy.shift` | `3.1` | raise to 12-13 if outputs come out blurry/soft |
 | `gen.speed_profile` | `full` | `full` = 40 steps, production quality; `lightning` = 8 steps, fast drafts (needs the lightning LoRAs) |
-| `gen.negative_prompt` | see file | applied to every generation |
+| `gen.negative_prompt` | see file | sent with every generation, but only takes effect at CFG > 1 (`full`, cfg 2.5). At CFG 1.0 (`lightning`) ComfyUI skips the negative branch entirely, so it is ignored there -- constraints that must hold (one character only) are in the positive instruction, at its start |
 | `concept.num_candidates` | `12` | how many hero candidates to generate per brief |
 
 Override any of these with `--config path/to/other.yaml` on any command, or

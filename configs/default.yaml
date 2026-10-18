@@ -31,6 +31,9 @@ gen:
   cfg_full: 2.5
   steps_lightning: 8
   cfg_lightning: 1.0
+  # Ignored when cfg is 1.0 (lightning): ComfyUI skips the negative branch
+  # at cfg 1. Only `full` (cfg 2.5) uses it -- keep must-hold constraints in
+  # the positive instruction (forge2/prompts/templates.py).
   negative_prompt: >-
     photorealistic, 3d render, blurry, deformed anatomy, extra limbs,
     text, words, letters, writing, typography, captions, labels, signage,

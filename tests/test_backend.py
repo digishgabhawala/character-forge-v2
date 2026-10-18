@@ -33,6 +33,14 @@ def test_resolve_profile_full_uses_full_steps_and_cfg():
     assert profile.cfg == cfg.gen.cfg_full
 
 
+def test_negative_prompt_is_ignored_at_cfg_one():
+    """ComfyUI's sampling_function drops the negative (uncond) branch when
+    cfg == 1.0, so the lightning profile never sees gen.negative_prompt."""
+    cfg = ForgeConfig()
+    assert resolve_profile(cfg, override="lightning").negative_prompt_applies is False
+    assert resolve_profile(cfg, override="full").negative_prompt_applies is True
+
+
 def test_completed_comfy_job_frees_models(monkeypatch):
     png = io.BytesIO()
     Image.new("RGB", (2, 2), "red").save(png, format="PNG")

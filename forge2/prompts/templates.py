@@ -34,7 +34,17 @@ def build_hero_prompt(card: CharacterCard) -> str:
 # Stage 2: production generation (no-LoRA, reference-conditioned)
 # ---------------------------------------------------------------------------
 
+# The solo constraint LEADS the instruction (and is repeated after the
+# scene). It cannot live only in gen.negative_prompt: the lightning profile
+# samples at CFG 1.0, where ComfyUI skips the negative conditioning entirely
+# (comfy/samplers.py sampling_function: cond_scale == 1.0 -> uncond = None),
+# so for lightning the positive text is the only thing the model reads. A
+# real lightning render of a "collaborative" scene came back with two copies
+# of the mascot despite the negative prompt -- see Profile.negative_prompt_applies.
 GENERATE_TEMPLATE = (
+    "Exactly one character in the image: {name} alone, solo, only one person "
+    "-- no second person, no second copy of {name}, no reflection or "
+    "duplicate. "
     "This is {name}, a {style} character. Keep the exact same character with "
     "identical face, hairstyle, body proportions, outfit and colors "
     "({identity}). Change only the following: {task}. Solo: a single "

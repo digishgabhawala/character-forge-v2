@@ -45,11 +45,23 @@ GENERATE_TEMPLATE = (
     "Exactly one character in the image: {name} alone, solo, only one person "
     "-- no second person, no second copy of {name}, no reflection or "
     "duplicate. "
+    "{clean} "
     "This is {name}, a {style} character. Keep the exact same character with "
     "identical face, hairstyle, body proportions, outfit and colors "
     "({identity}). Change only the following: {task}. Solo: a single "
     "character, only one person in the image -- never a second copy of "
-    "{name}. Same art style, clean bold linework, flat colors."
+    "{name}. Same art style, clean bold linework, flat colors.{avoid}"
+)
+
+# Same reasoning as the solo constraint: "brand logos" / "text" used to live
+# only in gen.negative_prompt, which lightning (CFG 1.0) never reads -- two of
+# three lightning renders drew an Apple logo on the laptop. Stated positively
+# first ("plain unbranded"), so the model has something to draw instead.
+CLEAN_CONSTRAINTS = (
+    "Plain unbranded objects: a plain unbranded laptop with a blank lid, plain "
+    "devices and plain clothing -- no brand logos or trademarks anywhere, no "
+    "readable text, words, letters or numbers. Flat 2D cartoon illustration, "
+    "never photorealistic."
 )
 
 
@@ -63,4 +75,13 @@ def build_generate_instruction(card: CharacterCard, task: str) -> str:
         style=card.style_tag,
         identity=card.identity_phrase(),
         task=task,
+        clean=CLEAN_CONSTRAINTS,
+        avoid=_avoid_clause(card),
     )
+
+
+def _avoid_clause(card: CharacterCard) -> str:
+    """The card's own negative_traits, restated in the positive text (the
+    negative prompt does not apply on lightning)."""
+    traits = card.negative_traits.strip().rstrip(".")
+    return f" Also: {traits}." if traits else ""

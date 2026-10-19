@@ -97,7 +97,8 @@ class GenConfig(BaseModel):
     cfg_lightning: float = 1.0
     negative_prompt: str = (
         "photorealistic, 3d render, blurry, deformed anatomy, extra limbs, "
-        "text, watermark, logos on clothing, brand logos, trademarks, "
+        "text, words, letters, readable text, watermark, logos on clothing, "
+        "brand logos, apple logo, logo on laptop, trademarks, "
         "inconsistent colors, two people, multiple characters, duplicate "
         "character, twins, crowd"
     )
